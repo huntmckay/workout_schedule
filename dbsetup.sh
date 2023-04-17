@@ -6,3 +6,5 @@ podman run --pod postgre-sql -e 'PGADMIN_DEFAULT_EMAIL=admin@email.com' -e 'PGAD
 podman pull docker.io/library/postgres:14
 
 podman run --name db --pod=postgre-sql -d -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=p0stdev docker.io/library/postgres:14
+
+firefox http://127.0.0.1:9876/browser/
