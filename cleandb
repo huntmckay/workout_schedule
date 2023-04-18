@@ -1,0 +1,6 @@
+#!/bin/bash
+
+podman rm --all --force
+podman pod rm --all --force
+
+podman ps -a
