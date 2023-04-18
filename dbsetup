@@ -7,5 +7,7 @@ podman run --name webdb --pod=postgre-sql -d -e 'PGADMIN_DEFAULT_EMAIL=admin@ema
 
 podman run --name db --pod=postgre-sql -d -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=p0stdev docker.io/library/postgres:14
 
+
+sleep 30
 firefox 0.0.0.0:5432
 podman exec -ti db psql -U admin

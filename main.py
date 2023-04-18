@@ -1,15 +1,23 @@
+import sqlalchemy
+
 class Exercise:
     def __init__(self, name, date):
         self.name = name
         self.date = date
+
+    def write(self):
+        
 
 class Lift(Exercise):
     def __init__(self, name, weight, reps, date):
         super().__init__(name, date)
         self.reps = reps
         self.weight = weight 
-
+    
     def __str__(self):
+        return f"I spit on you {self.weight} times"
+
+    def printsummary(self):
         return f"Lift = {self.name} ({self.weight}lbs for {self.reps} reps, on {self.date})"
 
 # # TODO define a new dataclass for different carido types
@@ -26,4 +34,5 @@ class Lift(Exercise):
 
 bench = Lift("Bench Press", 150, 10, '20230416')
 print(bench)
+print(bench.printsummary())
 
