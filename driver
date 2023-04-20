@@ -1,10 +1,14 @@
 #!/usr/bin/python3
 
+import datetime
 import psycopg2
 import sqlalchemy 
 
 from sqlalchemy import create_engine
 from sqlalchemy import text 
+
+TIME = datetime.datetime.now()
+
 
 def get_engine():
 
@@ -14,21 +18,23 @@ def get_engine():
 
 
 def execute():
-    engine = get_engine()
-    with engine.connect() as conn:
-            result = conn.execute(text("select 'hello world'"))
-            print(result.all())
 
-#     db = get_engine()
-#     with db.connect() as conn:
-#         conn.execute(text("CREATE TABLE some_table (x int, y int)"))
-#         conn.execute(
-#             text("INSERT INTO some_table (x, y) VALUES (:x, :y)"),
-#         [{"x": 1, "y": 1}, {"x":2,"y":4}],
-#         )
-#         conn.commit()
-#         connection.close()
-#         db.dispose()
+    db = get_engine()
+    with db.connect() as conn:
+        conn.execute(
+            text("SELECT * FROM benchpress")
+        )
+        conn.execute"(text("CREATE TABLE benchpress (date int,sets int, reps int, weight int)"))
+        conn.execute(
+            text("INSERT INTO benchpress (date, sets, reps, weight) VALUES (:date, :sets, :reps, :weight)"),
+            [{  
+                "date": TIME.strftime("%Y%M%d"),
+                "sets": 3, 
+                "reps": 10, 
+                "weight": 145
+            }]
+        )
+        conn.commit()
 
 if __name__ == '__main__':
     execute()
