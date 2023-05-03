@@ -3,12 +3,12 @@
 import datetime
 import psycopg2
 import sqlalchemy 
+import random
 
 from sqlalchemy import create_engine
 from sqlalchemy import text 
 
 TIME = datetime.datetime.now()
-
 
 def get_engine():
 
@@ -16,26 +16,45 @@ def get_engine():
     engine = create_engine("postgresql+psycopg2://admin:p0stdev@0.0.0.0", echo=True)
     return engine
 
-
-def execute():
-
+def create_table(table):
+    
     db = get_engine()
     with db.connect() as conn:
+        try:     
+            conn.execute(text(f"CREATE TABLE {table} (date int,sets int, reps int, weight int)"))
+            conn.commit()
+        except e as Exception:
+            print(f"table {table} already exists \n {e}")
+
+def insert_into_table(table):
+    
+    db = get_engine()
+
+    with db.connect() as conn:
+    
         conn.execute(
-            text("SELECT * FROM benchpress")
-        )
-        conn.execute"(text("CREATE TABLE benchpress (date int,sets int, reps int, weight int)"))
-        conn.execute(
-            text("INSERT INTO benchpress (date, sets, reps, weight) VALUES (:date, :sets, :reps, :weight)"),
+            text(f"INSERT INTO {table} (date, sets, reps, weight) VALUES (:date, :sets, :reps, :weight)"),
             [{  
                 "date": TIME.strftime("%Y%M%d"),
-                "sets": 3, 
-                "reps": 10, 
-                "weight": 145
+                "sets": random.randrange(1,6), 
+                "reps": random.randrange(1,15), 
+                "weight": random.randrange(20,200)
             }]
         )
         conn.commit()
 
+def read_from_table(table):
+
+    db = get_engine()
+    
+    with db.connect() as conn:
+        result = conn.execute(text(f"SELECT date,sets,reps,weight FROM {table}"))
+        for row in result:
+            print(f"date: {row.date} sets: {row.sets} reps: {row.sets} weight: {row.weight}") 
+        conn.commit()
+
 if __name__ == '__main__':
-    execute()
+    #create_table("benchpress")
+    insert_into_table("benchpress")
+    read_from_table("benchpress")
 #breakpoint()
