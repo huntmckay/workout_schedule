@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase,
 TIME = datetime.datetime.now()
 
 # Create an engine to connect to the database
-engine = create_engine("postgresql+psycopg2://admin:p0stdev@0.0.0.0", echo=True)
+engine = create_engine("postgresql+psycopg2://admin:p0stdev@0.0.0.0")
 
 # Create the base class as a subclass of DB class
 class Base(DeclarativeBase):
@@ -48,9 +48,12 @@ Base.metadata.create_all(engine)
 
 # Exercise input validation
 
-def exercise_validation():
+def exercise_validation(pick_table):
     
-    exercise_list=['benchpress','barbell_squat','barbell_curl','a','b','c']
+    if pick_table == 'Strength':
+        exercise_list=['benchpress','barbell_squat','barbell_curl']
+    else:
+        exercise_list=['road_run','trail_run','road_bike','mountain_bike','swim']
     while True:
         a = input("Enter Exercise name: ")
         if a in exercise_list:
@@ -60,38 +63,73 @@ def exercise_validation():
         for i in exercise_list:
             print(i)
     
-def int_validation(var):
+def int_validation(msg):
    
     while True:
-        print(var)
+        print(msg)
         a = input() 
         try:
             int(a)
             return a
         except Exception as e:
-            print(f"expected datatype int got '{type(var)}'")
+            print(f"expected datatype int got '{type(a)}'")
+
+def flt_validation(msg):
+
+    while True:
+        print(msg)
+        a = input()
+        try:
+            float(a)
+            breakpoint()
+            return a
+        except Exception as e:
+            print(f"expected datatype float got '{type(a)}'") 
      
 # Insert data
-def insert(exercise=str,sets=int,reps=int,weight=int):
+def insert(*args,**kwargs):
 
-    with Session(engine) as session:
-        entry = Strength(
-            exercise=exercise_validation(),
-            date=TIME.strftime("%Y%M%d"),
-            sets=int_validation(var="Enter # of Sets: "),
-            reps=int_validation(var="Enter # of Reps: "),
-            weight=int_validation(var="Enter # of Weight: ")
-        )
-        breakpoint()
-        session.add_all([entry])
-        session.commit()
+    pick_table = input("Which type of Exercise would you like to add [ Strength | Endurance ]: ") 
+    if pick_table == 'Strength':
 
+        with Session(engine) as session:
+            entry = Strength(
+                exercise=exercise_validation(pick_table),
+                date=TIME.strftime("%Y%M%d"),
+                sets=int_validation(msg="Enter # of Sets: "),
+                reps=int_validation(msg="Enter # of Reps: "),
+                weight=int_validation(msg="Enter # of Weight: ")
+            )
+            session.add_all([entry])
+            session.commit()
+
+    elif pick_table == 'Endurance':
+
+        with Session(engine) as session:
+            entry = Endurance(
+                exercise=exercise_validation(pick_table),
+                date=TIME.strftime("%Y%M%d"),
+                time=int_validation(msg="Enter total minutes: "),
+                distance=flt_validation(msg="Enter total miles: ")
+            )
+            session.add_all([entry])
+            session.commit()
+    else:
+        print(f"Expected 'Strength' or 'Endurance' got '{pick_table}'")
+        insert(*args,**kwargs)
 insert()
 
 def retrieve():
-   
-    with Session(engine) as session:
-        result = session.execute(select(Strength).order_by(Strength.id))
-        for i in result.all():
-            print(i)
+    
+    pick_table = input("Table to Retrieve [ Strength | Endurance ]:")   
+
+    try:
+        with Session(engine) as session:
+            result = session.execute(select(text(pick_table)).order_by(pick_table.id))
+            for i in result.all():
+                print(i)
+    except Exception as e:
+        print(e)
+    
+    retrieve()
 retrieve()
