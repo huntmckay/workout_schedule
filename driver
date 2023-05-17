@@ -1,60 +1,97 @@
 #!/usr/bin/python3
-
 import datetime
-import psycopg2
-import sqlalchemy 
 import random
-
-from sqlalchemy import create_engine
-from sqlalchemy import text 
+from typing import List
+from typing import Optional
+from sqlalchemy import create_engine, Column, Integer, String, select
+from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase, Session
 
 TIME = datetime.datetime.now()
 
-def get_engine():
+# Create an engine to connect to the database
+engine = create_engine("postgresql+psycopg2://admin:p0stdev@0.0.0.0", echo=True)
 
-    # dialect[+driver]://user:password@host/dbname[?key=value..]
-    engine = create_engine("postgresql+psycopg2://admin:p0stdev@0.0.0.0", echo=True)
-    return engine
+# Create the base class as a subclass of DB class
+class Base(DeclarativeBase):
+    pass
 
-def create_table(table):
+class Strength(Base):
     
-    db = get_engine()
-    with db.connect() as conn:
-        try:     
-            conn.execute(text(f"CREATE TABLE {table} (date int,sets int, reps int, weight int)"))
-            conn.commit()
-        except e as Exception:
-            print(f"table {table} already exists \n {e}")
+    __tablename__ = "strength_training"
 
-def insert_into_table(table):
-    
-    db = get_engine()
+    id: Mapped[int] = mapped_column(primary_key=True)
+    date: Mapped[int] 
+    exercise: Mapped[str] = mapped_column(String(30))
+    sets: Mapped[int]
+    reps: Mapped[int]
+    weight: Mapped[Optional[int]]
+   
+    def __repr__(self) -> str:
+        return f"Strength(id={self.id!r},date={self.date!r},exercise={self.exercise!r},sets={self.sets!r},reps={self.reps!r},weight={self.weight!r})"
 
-    with db.connect() as conn:
+class Endurance(Base):
     
-        conn.execute(
-            text(f"INSERT INTO {table} (date, sets, reps, weight) VALUES (:date, :sets, :reps, :weight)"),
-            [{  
-                "date": TIME.strftime("%Y%M%d"),
-                "sets": random.randrange(1,6), 
-                "reps": random.randrange(1,15), 
-                "weight": random.randrange(20,200)
-            }]
+    __tablename__ = "endurance_training"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    date: Mapped[int]
+    exercise: Mapped[str] = mapped_column(String(30))
+    time: Mapped[int]
+    distance: Mapped[int]
+   
+    def __repr__(self) -> str:
+        return f"Endurance(id={self.id!r},date={self.date!r},exercise={self.exercise!r},time={self.time!r},distance={self.distance!r})"
+
+# Create the Tables with the metadata and engine
+
+Base.metadata.create_all(engine)
+
+# Exercise input validation
+
+def exercise_validation():
+    
+    exercise_list=['benchpress','barbell_squat','barbell_curl','a','b','c']
+    while True:
+        a = input("Enter Exercise name: ")
+        if a in exercise_list:
+            return a
+        print(f"'{a}' not a valid exercise for this database")
+        print("Valid exercise names:\n")
+        for i in exercise_list:
+            print(i)
+    
+def int_validation(var):
+   
+    while True:
+        print(var)
+        a = input() 
+        try:
+            int(a)
+            return a
+        except Exception as e:
+            print(f"expected datatype int got '{type(var)}'")
+     
+# Insert data
+def insert(exercise=str,sets=int,reps=int,weight=int):
+
+    with Session(engine) as session:
+        entry = Strength(
+            exercise=exercise_validation(),
+            date=TIME.strftime("%Y%M%d"),
+            sets=int_validation(var="Enter # of Sets: "),
+            reps=int_validation(var="Enter # of Reps: "),
+            weight=int_validation(var="Enter # of Weight: ")
         )
-        conn.commit()
+        breakpoint()
+        session.add_all([entry])
+        session.commit()
 
-def read_from_table(table):
+insert()
 
-    db = get_engine()
-    
-    with db.connect() as conn:
-        result = conn.execute(text(f"SELECT date,sets,reps,weight FROM {table}"))
-        for row in result:
-            print(f"date: {row.date} sets: {row.sets} reps: {row.sets} weight: {row.weight}") 
-        conn.commit()
-
-if __name__ == '__main__':
-    #create_table("benchpress")
-    insert_into_table("benchpress")
-    read_from_table("benchpress")
-#breakpoint()
+def retrieve():
+   
+    with Session(engine) as session:
+        result = session.execute(select(Strength).order_by(Strength.id))
+        for i in result.all():
+            print(i)
+retrieve()
