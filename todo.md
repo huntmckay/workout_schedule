@@ -1,6 +1,19 @@
 # todo.md
 [] write weekly workout planner
 [] make dbcontol script
-[] shutdown containers at night with dbcontrol
-[] start up ontainers in morning with dbcontrol
 [] figure out click for user interface
+
+[] SELECT - extracts data from a database
+[] UPDATE - updates data in a database
+[] DELETE - deletes data from a database
+[] INSERT INTO - inserts new data into a database
+[] CREATE DATABASE - creates a new database
+[] ALTER DATABASE - modifies a database
+[] CREATE TABLE - creates a new table
+[] ALTER TABLE - modifies a table
+[] DROP TABLE - deletes a table
+[] CREATE INDEX - creates an index (search key)
+[] DROP INDEX - deletes an index
+
+[] build strava worker to pull cardio from api
+[] build downdog worker to pull yoga from api

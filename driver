@@ -1,15 +1,12 @@
 #!/usr/bin/python3
 import datetime
 import random
+import click
 from typing import List
 from typing import Optional
 from sqlalchemy import create_engine, Column, Integer, String, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase, Session
 
-TIME = datetime.datetime.now()
-
-# Create an engine to connect to the database
-engine = create_engine("postgresql+psycopg2://admin:p0stdev@0.0.0.0")
 
 # Create the base class as a subclass of DB class
 class Base(DeclarativeBase):
@@ -42,13 +39,10 @@ class Endurance(Base):
     def __repr__(self) -> str:
         return f"Endurance(id={self.id!r},date={self.date!r},exercise={self.exercise!r},time={self.time!r},distance={self.distance!r})"
 
-# Create the Tables with the metadata and engine
-Base.metadata.create_all(engine)
-
 # Exercise input validation
-def exercise_validation(pick_table):
+def exercise_validation(table_name):
     
-    if pick_table == 'Strength':
+    if table_name == 'Strength':
         exercise_list=['benchpress','barbell_squat','barbell_curl']
     else:
         exercise_list=['road_run','trail_run','road_bike','mountain_bike','swim']
@@ -81,19 +75,22 @@ def flt_validation(msg):
         a = input()
         try:
             float(a)
-            breakpoint()
             return a
         except Exception as e:
             print(f"expected datatype float got '{type(a)}'") 
-     
+
+def pick_table():
+    table = input("Table to Retrieve [ Strength | Endurance ]: ").title()   
+    return table
+
 def insert(*args,**kwargs):
 
-    pick_table = input("Which type of Exercise would you like to add [ Strength | Endurance ]: ") 
-    if pick_table == 'Strength':
+    table_name = pick_table()
+    if table_name == 'Strength':
 
         with Session(engine) as session:
             entry = Strength(
-                exercise=exercise_validation(pick_table),
+                exercise=exercise_validation(table_name),
                 date=TIME.strftime("%Y%M%d"),
                 sets=int_validation(msg="Enter # of Sets: "),
                 reps=int_validation(msg="Enter # of Reps: "),
@@ -102,11 +99,11 @@ def insert(*args,**kwargs):
             session.add_all([entry])
             session.commit()
 
-    elif pick_table == 'Endurance':
+    elif table_name == 'Endurance':
 
         with Session(engine) as session:
             entry = Endurance(
-                exercise=exercise_validation(pick_table),
+                exercise=exercise_validation(table_name),
                 date=TIME.strftime("%Y%M%d"),
                 time=int_validation(msg="Enter total minutes: "),
                 distance=flt_validation(msg="Enter total miles: ")
@@ -117,14 +114,11 @@ def insert(*args,**kwargs):
         print(f"Expected 'Strength' or 'Endurance' got '{pick_table}'")
         insert(*args,**kwargs)
 
-# this should get replaced with click
-#insert()
-
 # TODO def pick_table()
 def retrieve():
     
     while True:
-        pick_table = input("Table to Retrieve [ Strength | Endurance ]:").title()   
+        pick_table()
         
         if pick_table == 'Strength':
             with Session(engine) as session:
@@ -132,13 +126,36 @@ def retrieve():
                 for i in result.all():
                     print(i[0])
             return
+
         elif pick_table == 'Endurance':
             with Session(engine) as session:
                 result = session.execute(select(Endurance).order_by(Endurance.id))
                 for i in result.all():
                     print(i[0])
             return
+
         else:
             print(f"Expected 'Strength' or 'Endurance' got '{pick_table}'")
             retrieve()
-retrieve()
+
+def delete():
+    pass
+
+def main():
+    action = 'insert'
+    if action == 'insert':
+        cont='y'
+        while cont == 'y':
+            insert()
+            cont = input("Do you have more entries? (y/n): ")
+    if action == 'retrieve':
+        retrieve()
+    
+if __name__ == '__main__':
+    TIME = datetime.datetime.now()
+    # Create an engine to connect to the database
+    engine = create_engine("postgresql+psycopg2://admin:p0stdev@0.0.0.0")
+    # Create the Tables with the metadata and engine
+    Base.metadata.create_all(engine)
+    
+    main()
