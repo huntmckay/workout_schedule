@@ -56,3 +56,7 @@ SQLAlchemy ORM builds upon the Core to provide optional object relational mappin
 [Flask API](https://www.fullstackpython.com/api-creation.html)
 # Website security
 [web sec](https://www.fullstackpython.com/web-application-security.html)
+# deploy to production
+[prod deploy](https://flask.palletsprojects.com/en/2.3.x/deploying/)
+# How Run
+flask --app run jenky-web.py

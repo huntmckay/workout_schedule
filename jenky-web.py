@@ -35,6 +35,10 @@ class Flexibility(db.Model):
 with app.app_context():
     db.create_all()
 
+@app.route("/")
+def index():
+    return 'Index Page'
+
 # for more queries https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/queries/
 @app.route("/strength")
 def strength_exercise_list():
