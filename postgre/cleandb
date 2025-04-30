@@ -1,6 +1,0 @@
-#!/bin/bash
-
-podman rm --all --force
-podman pod rm --all --force
-sudo rm -rf ./data/volume
-podman ps -a
