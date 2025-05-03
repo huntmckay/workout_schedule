@@ -1,8 +1,9 @@
-# Pull 2
+# pull 2
 
-## Lifting
+## may 2 2025
+### lifting
 
-| Lift                  | sets x reps | weight | effort |
+| lift                  | sets x reps | weight | effort |
 |-----------------------|:-----------:|:------:|:------:|
 | iso lateral row | 4x6 | 300 | 6,6,6,6 |
 | meadows row | 3x6 | 90 | 8,6,6 |
@@ -15,11 +16,11 @@
 | deficit sit ups | 5x12 | 45 | 12,12,12,12,10 |
 | cable y-raise | 3x12 | 15 | dna |
 
-## Cardio
+### cardio
 8 minutes max incline walk @ 2mph
 
-## Recovery
+### recovery
 dna
 
-## Notes
+### notes
 started to get hungry, this work is a long one. dropping wrist work 4 sets, removing lat pull downs. 
